@@ -1,0 +1,63 @@
+name: Stakeholder analysis field trip checklist template
+description: This template is to help plan and organize winter 2025 field trips for the stakeholder mapping and analysis milestone.
+title: "[Field trip]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill out this checklist when planning a field trip for shrimp futures.
+  - type: input
+    id: contact
+    attributes:
+      label: Primary Contact
+      description: Who is filling out this form?
+      placeholder: "Your name"
+    validations:
+      required: true
+      
+  - type: checkboxes
+    id: state
+    attributes:
+      label: What state(s) will be visited on this trip?
+      description: Please select one or more options
+      options:
+        - label: North Carolina
+        - label: South Carolina
+        - label: Georgia
+        - label: Florida
+        - label: Alabama
+        - label: Mississippi
+        - label: Louisiana
+        - label: Texas
+    validations:
+      required: true
+      
+  - type: textarea
+    id: regions
+    attributes:
+      label: What specific regions or cities will be visited on this trip?
+      description: Please fill in any specifics about the areas that will be visited
+      value: "Ex. West central Florida including Tampa, St. Petersburg, Fort Myers"
+    validations:
+      required: true
+        
+  - type: checkboxes
+    id: personnel
+    attributes:
+      label: Who will be going on this trip?
+      description: Select one or more option, including other
+      options:
+        - Carissa Gervasi
+        - Kelsi Furman
+        - Matt McPherson
+        - Other
+    validations:
+      required: true
+      
+  - type: text
+    id: other_personnel
+  attributes:
+    label: If "Other," please specify:
+  conditions:
+    - field: personnel
+      value: Other
