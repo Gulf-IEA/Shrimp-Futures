@@ -7,11 +7,11 @@
 library(tidyverse)
 
 # Load data (adjust file path as necessary)
-df_raw <- read.csv("data/Salience scores for all interviews2.csv", encoding = "latin1")
+df_raw <- read.csv("data/Salience scores for all interviews3.csv", encoding = "latin1")
 
 # Clean up column spaces and add Macro-Region classifications
 df_clean <- df_raw %>%
-  select(Document_ID, Document_Type, Cohort, State, Theme_Category, Parent_Code, S, I, R, DSI) %>%
+  select(Document_ID, Document_Type, Integrated, Cohort, State, Theme_Category, Parent_Code, S, I, R, DSI) %>%
   mutate(
     # Clean leading/trailing spaces from text columns
     Parent_Code = trimws(Parent_Code),
@@ -31,6 +31,13 @@ df_clean <- df_raw %>%
       TRUE ~ "Unknown"
     )
   )
+
+
+v_int = df_clean %>% 
+  subset(Integrated == "Yes") 
+
+
+print(unique(v_int$Document_ID))
 
 # ==============================================================================
 # PHASE 1: MACRO ANALYSIS (Supply Chain Transcripts Only, No Experts)
@@ -71,7 +78,7 @@ p1 <- ggplot(macro_data, aes(x = reorder(Parent_Code, Mean_DSI), y = Mean_DSI, f
     panel.grid.minor = element_blank()
   )
 
-ggsave("plots/01_macro_industry_trends.png", plot = p1, width = 9, height = 8, dpi = 300)
+ggsave("plots/01_macro_industry_trends2.png", plot = p1, width = 9, height = 8, dpi = 300)
 
 # ==============================================================================
 # PHASE 2: COHORT ANALYSIS (Supply Chain Transcripts Only)
@@ -119,7 +126,7 @@ p2_updated <- ggplot(cohort_summary_with_prev, aes(x = Mean_DSI, y = reorder(Lab
     panel.spacing = unit(2.5, "lines")
   )
 
-ggsave("plots/02_cohort_priority_track.png", plot = p2_updated, width = 13, height = 7, dpi = 300)
+ggsave("plots/02_cohort_priority_track2.png", plot = p2_updated, width = 13, height = 7, dpi = 300)
 
 # ==============================================================================
 # PHASE 3: EXPERT CONCERNS AND IDEAS (Expert Notes Only)
@@ -160,7 +167,7 @@ p3 <- ggplot(expert_data, aes(x = reorder(Parent_Code, Mean_DSI), y = Mean_DSI, 
     panel.grid.minor = element_blank()
   )
 
-ggsave("plots/03_expert_priorities_profile.png", plot = p3, width = 9, height = 8, dpi = 300)
+ggsave("plots/03_expert_priorities_profile2.png", plot = p3, width = 9, height = 8, dpi = 300)
 
 # ==============================================================================
 # PHASE 4: REGIONAL TRENDS BY COHORT (Gulf vs. South Atlantic)
@@ -216,7 +223,7 @@ p4_updated <- ggplot(regional_summary_with_prev) +
     panel.spacing = unit(2, "lines")
   )
 
-ggsave("plots/04_regional_gap_matrix.png", plot = p4_updated, width = 13, height = 8, dpi = 300)
+ggsave("plots/04_regional_gap_matrix2.png", plot = p4_updated, width = 13, height = 8, dpi = 300)
 
 # ==============================================================================
 # END OF SCRIPT 
