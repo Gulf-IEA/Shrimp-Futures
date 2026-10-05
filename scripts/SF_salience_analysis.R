@@ -11,7 +11,8 @@ df_raw <- read.csv("data/Salience scores for all interviews3.csv", encoding = "l
 
 # Clean up column spaces and add Macro-Region classifications
 df_clean <- df_raw %>%
-  select(Document_ID, Document_Type, Integrated, Cohort, State, Theme_Category, Parent_Code, S, I, R, DSI) %>%
+  select(Document_ID, Document_Type, Integrated, Cohort, State, Theme_Category, Parent_Code, S, I, R, DSI, Sub_Codes
+) %>%
   mutate(
     # Clean leading/trailing spaces from text columns
     Parent_Code = trimws(Parent_Code),
@@ -39,6 +40,12 @@ v_int = df_clean %>%
 
 print(unique(v_int$Document_ID))
 
+df_clean = df_clean %>% 
+  mutate(Theme_Category = str_replace(Theme_Category, "Strategies", "Ideas"))
+
+df_clean = df_clean %>% 
+  mutate(Cohort = str_replace(Cohort, "Dealer/Dock", "Shore-Based Intermediary"))
+
 # ==============================================================================
 # PHASE 1: MACRO ANALYSIS (Supply Chain Transcripts Only, No Experts)
 # ==============================================================================
@@ -62,16 +69,16 @@ p1 <- ggplot(macro_data, aes(x = reorder(Parent_Code, Mean_DSI), y = Mean_DSI, f
   coord_flip() +
   facet_wrap(~Theme_Category, scales = "free_y", ncol = 1) +
   labs(
-    title = "Macro Analysis: Industry-Wide Theme Salience",
-    subtitle = "Verbatim Transcripts Only (Excludes Experts)",
+    #title = "Macro Analysis: Industry-Wide Theme Salience",
+    #subtitle = "Verbatim Transcripts Only (Excludes Experts)",
     x = NULL,
     y = "Mean DSI Score (Linear Sum: S + I + R)"
   ) +
   theme_minimal(base_size = 14) + # Scaled up base size
   theme(
     legend.position = "none",
-    plot.title = element_text(face = "bold", size = 18),
-    plot.subtitle = element_text(color = "dimgray", size = 13, margin = margin(b = 10)),
+    #plot.title = element_text(face = "bold", size = 18),
+    #plot.subtitle = element_text(color = "dimgray", size = 13, margin = margin(b = 10)),
     axis.text.y = element_text(face = "bold", color = "black", size = 12), # Prominent labels
     axis.text.x = element_text(size = 12),
     strip.text = element_text(face = "bold", size = 14, hjust = 0),
@@ -99,21 +106,21 @@ cohort_summary_with_prev <- df_clean %>%
   summarize(Mean_DSI = mean(DSI, na.rm = TRUE), .groups = "drop")
 
 p2_updated <- ggplot(cohort_summary_with_prev, aes(x = Mean_DSI, y = reorder(Label_With_Prev, Mean_DSI))) +
-  geom_line(aes(group = Label_With_Prev), color = "gray85", size = 1) +
+  geom_line(aes(group = Label_With_Prev), color = "gray85", linewidth = 1) +
   geom_point(aes(color = Cohort), size = 5.5, alpha = 0.9) + # Slightly larger dots to balance text
-  facet_wrap(~Theme_Category, scales = "free_y", ncol = 2) +
-  scale_color_manual(values = c("Harvester" = "#0284c7", "Processor" = "#7c3aed", "Dealer/Dock" = "#f59e0b")) +
+  facet_wrap(~Theme_Category, scales = "free_y", ncol = 1) +
+  scale_color_manual(values = c("Harvester" = "#0284c7", "Processor" = "#7c3aed", "Shore-Based Intermediary" = "#f59e0b")) +
   labs(
-    title = "Industry Priorities: Who Cares Most About What?",
-    subtitle = "Comparing average theme salience scores. Percentages (%) show how many stakeholders raised the topic.",
+    #title = "Industry Priorities: Who Cares Most About What?",
+    #subtitle = "Comparing average theme salience scores. Percentages (%) show how many stakeholders raised the topic.",
     x = "Community Salience Score (0 = Low Priority, 9 = High Priority)",
     y = NULL,
     color = "Supply Chain Role:"
   ) +
   theme_minimal(base_size = 15) + # Scaled up base size
   theme(
-    plot.title = element_text(face = "bold", size = 18),
-    plot.subtitle = element_text(color = "dimgray", size = 13, margin = margin(b = 12)),
+    #plot.title = element_text(face = "bold", size = 18),
+    #plot.subtitle = element_text(color = "dimgray", size = 13, margin = margin(b = 12)),
     strip.text = element_text(face = "bold", size = 15, color = "black"),
     axis.text.y = element_text(face = "bold", color = "gray10", size = 12), # Bold y-axis labels
     axis.text.x = element_text(size = 12, face = "bold"),
@@ -126,7 +133,7 @@ p2_updated <- ggplot(cohort_summary_with_prev, aes(x = Mean_DSI, y = reorder(Lab
     panel.spacing = unit(2.5, "lines")
   )
 
-ggsave("plots/02_cohort_priority_track2.png", plot = p2_updated, width = 13, height = 7, dpi = 300)
+ggsave("plots/02_cohort_priority_track2.png", plot = p2_updated, width = 11, height = 7, dpi = 300)
 
 # ==============================================================================
 # PHASE 3: EXPERT CONCERNS AND IDEAS (Expert Notes Only)
@@ -147,20 +154,20 @@ print(expert_data)
 
 # Visualization: Expert Profile
 p3 <- ggplot(expert_data, aes(x = reorder(Parent_Code, Mean_DSI), y = Mean_DSI, fill = Theme_Category)) +
-  geom_bar(stat = "identity", fill = "#475569", alpha = 0.85, width = 0.75) +
+  geom_bar(stat = "identity", alpha = 0.85, width = 0.75) +
   coord_flip() +
   facet_wrap(~Theme_Category, scales = "free_y", ncol = 1) +
   labs(
-    title = "Expert Perspectives: Salience and Priorities",
-    subtitle = "Based on Briefings & Macro-Level Policy Notes from Regional Experts",
+    #title = "Expert Perspectives: Salience and Priorities",
+    #subtitle = "Based on Briefings & Macro-Level Policy Notes from Regional Experts",
     x = NULL,
     y = "Mean DSI Score (Linear Sum: S + I + R)"
   ) +
   theme_minimal(base_size = 14) +
   theme(
     legend.position = "none",
-    plot.title = element_text(face = "bold", size = 18),
-    plot.subtitle = element_text(color = "dimgray", size = 13, margin = margin(b = 10)),
+    #plot.title = element_text(face = "bold", size = 18),
+    #plot.subtitle = element_text(color = "dimgray", size = 13, margin = margin(b = 10)),
     axis.text.y = element_text(face = "bold", color = "black", size = 12),
     axis.text.x = element_text(size = 12),
     strip.text = element_text(face = "bold", size = 14, hjust = 0),
@@ -200,16 +207,16 @@ p4_updated <- ggplot(regional_summary_with_prev) +
   facet_grid(Theme_Category ~ Cohort, scales = "free_y", space = "free_y") +
   scale_color_manual(values = c("Gulf" = "#1e3a8a", "South Atlantic" = "#ea580c")) +
   labs(
-    title = "The Regional Gap: Gulf Coast vs. South Atlantic",
-    subtitle = "Comparing average issue salience. Percentages (%) indicate industry-wide topic prevalence.",
+    #title = "The Regional Gap: Gulf Coast vs. South Atlantic",
+    #subtitle = "Comparing average issue salience. Percentages (%) indicate industry-wide topic prevalence.",
     x = "Community Salience Score (0 = Low Priority, 9 = High Priority)",
     y = NULL,
     color = "Region:"
   ) +
   theme_bw(base_size = 15) + # Scaled up base size
   theme(
-    plot.title = element_text(face = "bold", size = 18),
-    plot.subtitle = element_text(color = "dimgray", size = 13, margin = margin(b = 12)),
+    #plot.title = element_text(face = "bold", size = 18),
+    #plot.subtitle = element_text(color = "dimgray", size = 13, margin = margin(b = 12)),
     strip.text = element_text(face = "bold", size = 13, color = "white"),
     strip.background = element_rect(fill = "#27272a"),
     axis.text.y = element_text(face = "bold", color = "gray10", size = 12), # High readability theme tracking
@@ -223,8 +230,42 @@ p4_updated <- ggplot(regional_summary_with_prev) +
     panel.spacing = unit(2, "lines")
   )
 
-ggsave("plots/04_regional_gap_matrix2.png", plot = p4_updated, width = 13, height = 8, dpi = 300)
+ggsave("plots/04_regional_gap_matrix2.png", plot = p4_updated, width = 11, height = 8, dpi = 300)
 
 # ==============================================================================
-# END OF SCRIPT 
+# Sub-Codes 
 # ==============================================================================
+
+write.csv(df_clean, "data/cleaned_salience.csv", row.names = FALSE)
+
+
+
+
+
+
+###### sample size table #######
+
+sample_size <- df_clean %>% 
+  filter(Parent_Code == "Costs")
+
+sample_size <- sample_size %>%
+  group_by(Document_Type, Cohort, Macro_Region) %>%
+  summarize(
+    count = n())
+
+document <- sample_size %>%
+  group_by(Document_Type) %>%
+  summarize(
+    count = n())
+
+cohort <- sample_size %>%
+  group_by(Cohort) %>%
+  summarize(
+    count = n())
+
+region <- sample_size %>%
+  group_by(Macro_Region) %>%
+  summarize(
+    count = n())
+
+
